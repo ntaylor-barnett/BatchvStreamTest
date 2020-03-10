@@ -17,25 +17,29 @@ import (
 
 // BuildBatchGRPCPayload builds the payload for the public batchGRPC endpoint
 // from CLI flags.
-func BuildBatchGRPCPayload(publicBatchGRPCMessage string) ([]*public.TestPayload, error) {
+func BuildBatchGRPCPayload(publicBatchGRPCMessage string) (*public.TestPayloadBatch, error) {
 	var err error
 	var message publicpb.BatchGRPCRequest
 	{
 		if publicBatchGRPCMessage != "" {
 			err = json.Unmarshal([]byte(publicBatchGRPCMessage), &message)
 			if err != nil {
-				return nil, fmt.Errorf("invalid JSON for message, example of valid JSON:\n%s", "'{\n      \"field\": [\n         {\n            \"first_field\": \"Nisi labore praesentium.\",\n            \"organization_id\": 2448622867,\n            \"second_field\": \"Maiores natus assumenda.\",\n            \"third_field\": \"Molestias ex.\"\n         },\n         {\n            \"first_field\": \"Nisi labore praesentium.\",\n            \"organization_id\": 2448622867,\n            \"second_field\": \"Maiores natus assumenda.\",\n            \"third_field\": \"Molestias ex.\"\n         }\n      ]\n   }'")
+				return nil, fmt.Errorf("invalid JSON for message, example of valid JSON:\n%s", "'{\n      \"records\": [\n         {\n            \"first_field\": \"Nisi labore praesentium.\",\n            \"organization_id\": 2448622867,\n            \"second_field\": \"Maiores natus assumenda.\",\n            \"third_field\": \"Molestias ex.\"\n         },\n         {\n            \"first_field\": \"Nisi labore praesentium.\",\n            \"organization_id\": 2448622867,\n            \"second_field\": \"Maiores natus assumenda.\",\n            \"third_field\": \"Molestias ex.\"\n         },\n         {\n            \"first_field\": \"Nisi labore praesentium.\",\n            \"organization_id\": 2448622867,\n            \"second_field\": \"Maiores natus assumenda.\",\n            \"third_field\": \"Molestias ex.\"\n         },\n         {\n            \"first_field\": \"Nisi labore praesentium.\",\n            \"organization_id\": 2448622867,\n            \"second_field\": \"Maiores natus assumenda.\",\n            \"third_field\": \"Molestias ex.\"\n         }\n      ]\n   }'")
 			}
 		}
 	}
-	v := make([]*public.TestPayload, len(message.Field))
-	for i, val := range message.Field {
-		v[i] = &public.TestPayload{
-			FirstField:     val.FirstField,
-			SecondField:    val.SecondField,
-			ThirdField:     val.ThirdField,
-			OrganizationID: val.OrganizationId,
+	v := &public.TestPayloadBatch{}
+	if message.Records != nil {
+		v.Records = make([]*public.TestPayload, len(message.Records))
+		for i, val := range message.Records {
+			v.Records[i] = &public.TestPayload{
+				FirstField:     val.FirstField,
+				SecondField:    val.SecondField,
+				ThirdField:     val.ThirdField,
+				OrganizationID: val.OrganizationId,
+			}
 		}
 	}
+
 	return v, nil
 }

@@ -12,6 +12,7 @@ require (
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/kr/pretty v0.2.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
+	github.com/pkg/errors v0.8.1
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/rogpeppe/go-internal v1.5.2 // indirect
 	github.com/stretchr/testify v1.5.1 // indirect
@@ -20,6 +21,7 @@ require (
 	golang.org/x/exp v0.0.0-20200228211341-fcea875c7e85 // indirect
 	golang.org/x/image v0.0.0-20200119044424-58c23975cae1 // indirect
 	golang.org/x/mobile v0.0.0-20200222142934-3c8601c510d0 // indirect
+	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 	golang.org/x/tools v0.0.0-20200309202150-20ab64c0d93f // indirect
 	google.golang.org/genproto v0.0.0-20200309141739-5b75447e413d // indirect
 	google.golang.org/grpc v1.27.1

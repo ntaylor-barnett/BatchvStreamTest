@@ -19,9 +19,9 @@ import (
 // EncodeBatchGRPCResponse encodes responses from the "public" service
 // "batchGRPC" endpoint.
 func EncodeBatchGRPCResponse(ctx context.Context, v interface{}, hdr, trlr *metadata.MD) (interface{}, error) {
-	result, ok := v.([]*public.TestPayload)
+	result, ok := v.([]*public.ResponsePayload)
 	if !ok {
-		return nil, goagrpc.ErrInvalidType("public", "batchGRPC", "[]*public.TestPayload", v)
+		return nil, goagrpc.ErrInvalidType("public", "batchGRPC", "[]*public.ResponsePayload", v)
 	}
 	resp := NewBatchGRPCResponse(result)
 	return resp, nil
@@ -39,7 +39,7 @@ func DecodeBatchGRPCRequest(ctx context.Context, v interface{}, md metadata.MD) 
 			return nil, goagrpc.ErrInvalidType("public", "batchGRPC", "*publicpb.BatchGRPCRequest", v)
 		}
 	}
-	var payload []*public.TestPayload
+	var payload *public.TestPayloadBatch
 	{
 		payload = NewBatchGRPCPayload(message)
 	}
@@ -49,9 +49,9 @@ func DecodeBatchGRPCRequest(ctx context.Context, v interface{}, md metadata.MD) 
 // EncodeStreamedBatchGRPCResponse encodes responses from the "public" service
 // "streamedBatchGRPC" endpoint.
 func EncodeStreamedBatchGRPCResponse(ctx context.Context, v interface{}, hdr, trlr *metadata.MD) (interface{}, error) {
-	result, ok := v.([]*public.TestPayload)
+	result, ok := v.(*public.ResponsePayload)
 	if !ok {
-		return nil, goagrpc.ErrInvalidType("public", "streamedBatchGRPC", "[]*public.TestPayload", v)
+		return nil, goagrpc.ErrInvalidType("public", "streamedBatchGRPC", "*public.ResponsePayload", v)
 	}
 	resp := NewStreamedBatchGRPCResponse(result)
 	return resp, nil

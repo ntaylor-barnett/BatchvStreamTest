@@ -33,9 +33,9 @@ func BuildBatchGRPCFunc(grpccli publicpb.PublicClient, cliopts ...grpc.CallOptio
 
 // EncodeBatchGRPCRequest encodes requests sent to public batchGRPC endpoint.
 func EncodeBatchGRPCRequest(ctx context.Context, v interface{}, md *metadata.MD) (interface{}, error) {
-	payload, ok := v.([]*public.TestPayload)
+	payload, ok := v.(*public.TestPayloadBatch)
 	if !ok {
-		return nil, goagrpc.ErrInvalidType("public", "batchGRPC", "[]*public.TestPayload", v)
+		return nil, goagrpc.ErrInvalidType("public", "batchGRPC", "*public.TestPayloadBatch", v)
 	}
 	return NewBatchGRPCRequest(payload), nil
 }

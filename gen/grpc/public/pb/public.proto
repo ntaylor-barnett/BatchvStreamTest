@@ -16,11 +16,11 @@ service Public {
 	// Receives an array of payloads
 	rpc BatchGRPC (BatchGRPCRequest) returns (BatchGRPCResponse);
 	// Receives an array of payloads
-	rpc StreamedBatchGRPC (stream StreamedBatchGRPCStreamingRequest) returns (stream StreamedBatchGRPCResponse);
+	rpc StreamedBatchGRPC (stream TestPayload) returns (stream StreamedBatchGRPCResponse);
 }
 
 message BatchGRPCRequest {
-	repeated TestPayload field = 1;
+	repeated TestPayload records = 1;
 }
 // an example payload
 message TestPayload {
@@ -31,13 +31,15 @@ message TestPayload {
 }
 
 message BatchGRPCResponse {
-	repeated TestPayload field = 1;
+	repeated ResponsePayload field = 1;
 }
-
-message StreamedBatchGRPCStreamingRequest {
-	repeated TestPayload field = 1;
+// an example payload
+message ResponsePayload {
+	string first_field = 1;
+	string fourth_field = 2;
 }
 
 message StreamedBatchGRPCResponse {
-	repeated TestPayload field = 1;
+	string first_field = 1;
+	string fourth_field = 2;
 }

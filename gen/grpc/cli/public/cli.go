@@ -29,7 +29,19 @@ func UsageCommands() string {
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
 	return os.Args[0] + ` public batch-grpc --message '{
-      "field": [
+      "records": [
+         {
+            "first_field": "Nisi labore praesentium.",
+            "organization_id": 2448622867,
+            "second_field": "Maiores natus assumenda.",
+            "third_field": "Molestias ex."
+         },
+         {
+            "first_field": "Nisi labore praesentium.",
+            "organization_id": 2448622867,
+            "second_field": "Maiores natus assumenda.",
+            "third_field": "Molestias ex."
+         },
          {
             "first_field": "Nisi labore praesentium.",
             "organization_id": 2448622867,
@@ -165,7 +177,19 @@ Receives an array of payloads
 
 Example:
     `+os.Args[0]+` public batch-grpc --message '{
-      "field": [
+      "records": [
+         {
+            "first_field": "Nisi labore praesentium.",
+            "organization_id": 2448622867,
+            "second_field": "Maiores natus assumenda.",
+            "third_field": "Molestias ex."
+         },
+         {
+            "first_field": "Nisi labore praesentium.",
+            "organization_id": 2448622867,
+            "second_field": "Maiores natus assumenda.",
+            "third_field": "Molestias ex."
+         },
          {
             "first_field": "Nisi labore praesentium.",
             "organization_id": 2448622867,

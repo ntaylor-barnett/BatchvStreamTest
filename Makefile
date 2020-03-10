@@ -4,7 +4,7 @@ depend:
 	go get -u google.golang.org/grpc
 	go get -u github.com/golang/protobuf/protoc-gen-go	
 
-gen: depend
+gen:
 	gobin -m -run goa.design/goa/v3/cmd/goa gen github.com/ntaylor-barnett/BatchvStreamTest/design
 
 example:
@@ -14,3 +14,6 @@ build:
 	go mod vendor
 	go mod download
 	go build ./cmd/public 
+	go build ./cmd/sender
+
+.PHONY: gen build example

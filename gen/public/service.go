@@ -16,7 +16,7 @@ import (
 // A mock service to test different service communication models
 type Service interface {
 	// Receives an array of payloads
-	BatchGRPC(context.Context, []*TestPayload) (res []*TestPayload, err error)
+	BatchGRPC(context.Context, *TestPayloadBatch) (res []*ResponsePayload, err error)
 	// Receives an array of payloads
 	StreamedBatchGRPC(context.Context, StreamedBatchGRPCServerStream) (err error)
 }
@@ -34,10 +34,10 @@ var MethodNames = [2]string{"batchGRPC", "streamedBatchGRPC"}
 // StreamedBatchGRPCServerStream is the interface a "streamedBatchGRPC"
 // endpoint server stream must satisfy.
 type StreamedBatchGRPCServerStream interface {
-	// Send streams instances of "[]*TestPayload".
-	Send([]*TestPayload) error
-	// Recv reads instances of "[]*TestPayload" from the stream.
-	Recv() ([]*TestPayload, error)
+	// Send streams instances of "ResponsePayload".
+	Send(*ResponsePayload) error
+	// Recv reads instances of "TestPayload" from the stream.
+	Recv() (*TestPayload, error)
 	// Close closes the stream.
 	Close() error
 }
@@ -45,20 +45,32 @@ type StreamedBatchGRPCServerStream interface {
 // StreamedBatchGRPCClientStream is the interface a "streamedBatchGRPC"
 // endpoint client stream must satisfy.
 type StreamedBatchGRPCClientStream interface {
-	// Send streams instances of "[]*TestPayload".
-	Send([]*TestPayload) error
-	// Recv reads instances of "[]*TestPayload" from the stream.
-	Recv() ([]*TestPayload, error)
+	// Send streams instances of "TestPayload".
+	Send(*TestPayload) error
+	// Recv reads instances of "ResponsePayload" from the stream.
+	Recv() (*ResponsePayload, error)
 	// Close closes the stream.
 	Close() error
 }
 
-// an example payload
+// TestPayloadBatch is the payload type of the public service batchGRPC method.
+type TestPayloadBatch struct {
+	Records []*TestPayload
+}
+
+// TestPayload is the streaming payload type of the public service
+// streamedBatchGRPC method.
 type TestPayload struct {
 	FirstField     string
 	SecondField    string
 	ThirdField     string
 	OrganizationID uint32
+}
+
+// an example response
+type ResponsePayload struct {
+	FirstField  string
+	FourthField string
 }
 
 // MakeUnauthenticated builds a goa.ServiceError from an error.

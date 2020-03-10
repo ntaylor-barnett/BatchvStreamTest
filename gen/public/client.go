@@ -28,13 +28,13 @@ func NewClient(batchGRPC, streamedBatchGRPC goa.Endpoint) *Client {
 }
 
 // BatchGRPC calls the "batchGRPC" endpoint of the "public" service.
-func (c *Client) BatchGRPC(ctx context.Context, p []*TestPayload) (res []*TestPayload, err error) {
+func (c *Client) BatchGRPC(ctx context.Context, p *TestPayloadBatch) (res []*ResponsePayload, err error) {
 	var ires interface{}
 	ires, err = c.BatchGRPCEndpoint(ctx, p)
 	if err != nil {
 		return
 	}
-	return ires.([]*TestPayload), nil
+	return ires.([]*ResponsePayload), nil
 }
 
 // StreamedBatchGRPC calls the "streamedBatchGRPC" endpoint of the "public"

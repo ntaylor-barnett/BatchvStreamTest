@@ -45,7 +45,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 // "batchGRPC" of service "public".
 func NewBatchGRPCEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		p := req.([]*TestPayload)
+		p := req.(*TestPayloadBatch)
 		return s.BatchGRPC(ctx, p)
 	}
 }

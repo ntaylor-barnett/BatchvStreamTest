@@ -14,15 +14,17 @@ import (
 
 // NewBatchGRPCRequest builds the gRPC request type from the payload of the
 // "batchGRPC" endpoint of the "public" service.
-func NewBatchGRPCRequest(payload []*public.TestPayload) *publicpb.BatchGRPCRequest {
+func NewBatchGRPCRequest(payload *public.TestPayloadBatch) *publicpb.BatchGRPCRequest {
 	message := &publicpb.BatchGRPCRequest{}
-	message.Field = make([]*publicpb.TestPayload, len(payload))
-	for i, val := range payload {
-		message.Field[i] = &publicpb.TestPayload{
-			FirstField:     val.FirstField,
-			SecondField:    val.SecondField,
-			ThirdField:     val.ThirdField,
-			OrganizationId: val.OrganizationID,
+	if payload.Records != nil {
+		message.Records = make([]*publicpb.TestPayload, len(payload.Records))
+		for i, val := range payload.Records {
+			message.Records[i] = &publicpb.TestPayload{
+				FirstField:     val.FirstField,
+				SecondField:    val.SecondField,
+				ThirdField:     val.ThirdField,
+				OrganizationId: val.OrganizationID,
+			}
 		}
 	}
 	return message
@@ -30,42 +32,31 @@ func NewBatchGRPCRequest(payload []*public.TestPayload) *publicpb.BatchGRPCReque
 
 // NewBatchGRPCResult builds the result type of the "batchGRPC" endpoint of the
 // "public" service from the gRPC response type.
-func NewBatchGRPCResult(message *publicpb.BatchGRPCResponse) []*public.TestPayload {
-	result := make([]*public.TestPayload, len(message.Field))
+func NewBatchGRPCResult(message *publicpb.BatchGRPCResponse) []*public.ResponsePayload {
+	result := make([]*public.ResponsePayload, len(message.Field))
 	for i, val := range message.Field {
-		result[i] = &public.TestPayload{
-			FirstField:     val.FirstField,
-			SecondField:    val.SecondField,
-			ThirdField:     val.ThirdField,
-			OrganizationID: val.OrganizationId,
+		result[i] = &public.ResponsePayload{
+			FirstField:  val.FirstField,
+			FourthField: val.FourthField,
 		}
 	}
 	return result
 }
 
-func NewStreamedBatchGRPCResponse(v *publicpb.StreamedBatchGRPCResponse) []*public.TestPayload {
-	result := make([]*public.TestPayload, len(v.Field))
-	for i, val := range v.Field {
-		result[i] = &public.TestPayload{
-			FirstField:     val.FirstField,
-			SecondField:    val.SecondField,
-			ThirdField:     val.ThirdField,
-			OrganizationID: val.OrganizationId,
-		}
+func NewResponsePayload(v *publicpb.StreamedBatchGRPCResponse) *public.ResponsePayload {
+	result := &public.ResponsePayload{
+		FirstField:  v.FirstField,
+		FourthField: v.FourthField,
 	}
 	return result
 }
 
-func NewStreamedBatchGRPCStreamingRequest(spayload []*public.TestPayload) *publicpb.StreamedBatchGRPCStreamingRequest {
-	v := &publicpb.StreamedBatchGRPCStreamingRequest{}
-	v.Field = make([]*publicpb.TestPayload, len(spayload))
-	for i, val := range spayload {
-		v.Field[i] = &publicpb.TestPayload{
-			FirstField:     val.FirstField,
-			SecondField:    val.SecondField,
-			ThirdField:     val.ThirdField,
-			OrganizationId: val.OrganizationID,
-		}
+func NewTestPayload(spayload *public.TestPayload) *publicpb.TestPayload {
+	v := &publicpb.TestPayload{
+		FirstField:     spayload.FirstField,
+		SecondField:    spayload.SecondField,
+		ThirdField:     spayload.ThirdField,
+		OrganizationId: spayload.OrganizationID,
 	}
 	return v
 }

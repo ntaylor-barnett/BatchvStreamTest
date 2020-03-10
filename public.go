@@ -19,7 +19,7 @@ func NewPublic(logger *log.Logger) public.Service {
 }
 
 // Receives an array of payloads
-func (s *publicsrvc) BatchGRPC(ctx context.Context, p []*public.TestPayload) (res []*public.TestPayload, err error) {
+func (s *publicsrvc) BatchGRPC(ctx context.Context, p *public.TestPayloadBatch) (res *public.TestPayloadBatch, err error) {
 	s.logger.Print("public.batchGRPC")
 	return
 }

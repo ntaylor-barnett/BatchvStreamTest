@@ -113,20 +113,20 @@ func (s *Server) StreamedBatchGRPC(stream publicpb.Public_StreamedBatchGRPCServe
 
 // Send streams instances of "publicpb.StreamedBatchGRPCResponse" to the
 // "streamedBatchGRPC" endpoint gRPC stream.
-func (s *StreamedBatchGRPCServerStream) Send(res []*public.TestPayload) error {
+func (s *StreamedBatchGRPCServerStream) Send(res *public.ResponsePayload) error {
 	v := NewStreamedBatchGRPCResponse(res)
 	return s.stream.Send(v)
 }
 
-// Recv reads instances of "publicpb.StreamedBatchGRPCStreamingRequest" from
-// the "streamedBatchGRPC" endpoint gRPC stream.
-func (s *StreamedBatchGRPCServerStream) Recv() ([]*public.TestPayload, error) {
-	var res []*public.TestPayload
+// Recv reads instances of "publicpb.TestPayload" from the "streamedBatchGRPC"
+// endpoint gRPC stream.
+func (s *StreamedBatchGRPCServerStream) Recv() (*public.TestPayload, error) {
+	var res *public.TestPayload
 	v, err := s.stream.Recv()
 	if err != nil {
 		return res, err
 	}
-	return NewStreamedBatchGRPCStreamingRequest(v), nil
+	return NewTestPayload(v), nil
 }
 
 func (s *StreamedBatchGRPCServerStream) Close() error {
