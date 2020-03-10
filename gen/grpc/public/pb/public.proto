@@ -1,0 +1,43 @@
+// Code generated with goa v3.1.1, DO NOT EDIT.
+//
+// public protocol buffer definition
+//
+// Command:
+// $ goa gen github.com/ntaylor-barnett/BatchvStreamTest/design
+
+syntax = "proto3";
+
+package public;
+
+option go_package = "publicpb";
+
+// A mock service to test different service communication models
+service Public {
+	// Receives an array of payloads
+	rpc BatchGRPC (BatchGRPCRequest) returns (BatchGRPCResponse);
+	// Receives an array of payloads
+	rpc StreamedBatchGRPC (stream StreamedBatchGRPCStreamingRequest) returns (stream StreamedBatchGRPCResponse);
+}
+
+message BatchGRPCRequest {
+	repeated TestPayload field = 1;
+}
+// an example payload
+message TestPayload {
+	string first_field = 1;
+	string second_field = 2;
+	string third_field = 3;
+	uint32 organization_id = 4;
+}
+
+message BatchGRPCResponse {
+	repeated TestPayload field = 1;
+}
+
+message StreamedBatchGRPCStreamingRequest {
+	repeated TestPayload field = 1;
+}
+
+message StreamedBatchGRPCResponse {
+	repeated TestPayload field = 1;
+}
