@@ -24,11 +24,15 @@ func main() {
 	recordCount := flag.Int("records", 1000, "How many records to push")
 	iterations := flag.Int("iter", 1, "how many times to execute the test")
 	flag.Parse()
+
 	client := GetClient()
 	ctx := context.Background()
 	switch strings.ToLower(*modeStrPtr) {
 	case "stream":
 		StreamData(ctx, client, *recordCount, *iterations)
+	default:
+		fmt.Println("Invalid command")
+		flag.PrintDefaults()
 	}
 
 }
@@ -113,6 +117,7 @@ func generateRecords(ctx context.Context, recordCount int) chan *public.TestPayl
 			}
 		}
 	}()
+	return out
 }
 
 const charset = "abcdefghijklmnopqrstuvwxyz" +
