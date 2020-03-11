@@ -91,6 +91,7 @@ func StreamData(ctx context.Context, client *public.Client, records, repeat int,
 		eg, egctx := errgroup.WithContext(ctx)
 		datachan := generateRecords(ctx, records)
 		sendcomplete := false
+		recordsSent := 0
 		eg.Go(func() (rErr error) {
 			// sender
 			defer func() {
@@ -99,37 +100,52 @@ func StreamData(ctx context.Context, client *public.Client, records, repeat int,
 					rErr = errors.Wrap(err, "failed to close output stream")
 				}
 			}()
-			select {
-			case <-egctx.Done():
-				return
-			case p, ok := <-datachan:
-				if !ok {
+		MainLoop:
+			for {
+				select {
+				case <-egctx.Done():
 					return
+				case p, ok := <-datachan:
+					if !ok {
+						break MainLoop
+					}
+
+					err := stream.Send(p)
+					if err != nil {
+						return errors.Wrap(err, "error returned from sender")
+					}
+					recordsSent++
 				}
-				err := stream.Send(p)
-				if err != nil {
-					return errors.Wrap(err, "error returned from sender")
-				}
+
 			}
 			sendcomplete = true
 			return nil
 		})
+		recordsRecieved := 0
 		eg.Go(func() error {
 			// reciever
+
 			for {
 				p, err := stream.Recv()
-				if err == io.EOF {
+				if p == nil || err == io.EOF {
 					if !sendcomplete {
 						return errors.New("server closed the response stream before we had finished sending data")
 					}
 					return nil // graceful closure
 				}
+				recordsRecieved++
 				_ = p // we dont actually care about the response, only that we got it
 			}
+
+			return nil
 		})
 		resulterr := eg.Wait()
 		if resulterr != nil {
 			panic(resulterr)
+		}
+
+		if recordsRecieved != records || recordsSent != records {
+			panic("oops")
 		}
 		elapsed := time.Since(timestarted)
 		totaltime += elapsed.Seconds()

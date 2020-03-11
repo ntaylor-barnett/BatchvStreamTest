@@ -2,6 +2,7 @@ package publicapi
 
 import (
 	"context"
+	"io"
 	"log"
 	"sync"
 
@@ -48,23 +49,26 @@ func (s *publicsrvc) StreamedBatchGRPC(ctx context.Context, mode *public.StreamM
 		if doLock {
 			mux.Lock()
 		}
-		// sender
-		select {
-		case <-egctx.Done():
-			return nil
-		case v, ok := <-datachan:
-			if !ok {
+		for {
+			// sender
+			select {
+			case <-egctx.Done():
 				return nil
+			case v, ok := <-datachan:
+				if !ok {
+					return nil
+				}
+				// we will test with immediate send at the moment. This is best case scenario
+				resp := &public.ResponsePayload{
+					FirstField:  v.FirstField,
+					FourthField: "yeah, no probs. All good mate",
+				}
+				err := stream.Send(resp)
+				if err != nil {
+					return errors.Wrap(err, "error when sending reply")
+				}
 			}
-			// we will test with immediate send at the moment. This is best case scenario
-			resp := &public.ResponsePayload{
-				FirstField:  v.FirstField,
-				FourthField: "yeah, no probs. All good mate",
-			}
-			err := stream.Send(resp)
-			if err != nil {
-				return errors.Wrap(err, "error when sending reply")
-			}
+
 		}
 		return nil
 	})
@@ -73,15 +77,20 @@ func (s *publicsrvc) StreamedBatchGRPC(ctx context.Context, mode *public.StreamM
 		//reciever
 		defer close(datachan)
 		defer mux.Unlock()
-		payload, err := stream.Recv()
-		if err != nil {
-			return err
-		}
-		select {
-		case <-egctx.Done():
-			return nil
-		case datachan <- payload:
-			// nothing to do here. data was recieved
+		for {
+			payload, err := stream.Recv()
+			if err == io.EOF {
+				return nil
+			} else if err != nil {
+				return err
+			}
+			select {
+			case <-egctx.Done():
+				return nil
+			case datachan <- payload:
+				// nothing to do here. data was recieved
+			}
+
 		}
 		return nil
 	})
