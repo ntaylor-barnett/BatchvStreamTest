@@ -18,7 +18,7 @@ type Service interface {
 	// Receives an array of payloads
 	BatchGRPC(context.Context, *TestPayloadBatch) (res []*ResponsePayload, err error)
 	// Receives an array of payloads
-	StreamedBatchGRPC(context.Context, StreamedBatchGRPCServerStream) (err error)
+	StreamedBatchGRPC(context.Context, *StreamMode, StreamedBatchGRPCServerStream) (err error)
 }
 
 // ServiceName is the name of the service as defined in the design. This is the
@@ -56,6 +56,13 @@ type StreamedBatchGRPCClientStream interface {
 // TestPayloadBatch is the payload type of the public service batchGRPC method.
 type TestPayloadBatch struct {
 	Records []*TestPayload
+}
+
+// StreamMode is the payload type of the public service streamedBatchGRPC
+// method.
+type StreamMode struct {
+	// if true, it will wait until all records are recieved before it processes
+	Recieveall *bool
 }
 
 // TestPayload is the streaming payload type of the public service

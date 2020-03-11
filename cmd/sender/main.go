@@ -20,7 +20,7 @@ import (
 )
 
 func main() {
-	modeStrPtr := flag.String("mode", "", "either stream or batch")
+	modeStrPtr := flag.String("mode", "", "either stream, streamwait or batch")
 	recordCount := flag.Int("records", 1000, "How many records to push")
 	iterations := flag.Int("iter", 1, "how many times to execute the test")
 	address := flag.String("addr", "127.0.0.1:8000", "address to connect to")
@@ -30,7 +30,9 @@ func main() {
 	ctx := context.Background()
 	switch strings.ToLower(*modeStrPtr) {
 	case "stream":
-		StreamData(ctx, client, *recordCount, *iterations)
+		StreamData(ctx, client, *recordCount, *iterations, false)
+	case "streamwait":
+		StreamData(ctx, client, *recordCount, *iterations, true)
 	case "batch":
 		BatchData(ctx, client, *recordCount, *iterations)
 	default:
@@ -68,15 +70,20 @@ func BatchData(ctx context.Context, client *public.Client, records, repeat int) 
 	fmt.Println(fmt.Sprintf("Average time %vms", (totaltime/float64(repeat))*1000))
 }
 
-func StreamData(ctx context.Context, client *public.Client, records, repeat int) {
+func StreamData(ctx context.Context, client *public.Client, records, repeat int, recieveall bool) {
 	fmt.Println(fmt.Sprintf("Started Bidrectional streaming test. Records: %v, Repetitions: %v", records, repeat))
 	ctx, canceller := context.WithCancel(ctx)
 	defer canceller()
 	var totaltime float64
+	mode := &public.StreamMode{}
+	mode.Recieveall = &recieveall
+	if recieveall {
+		fmt.Println("wait is enabled. Server will not respond with stream until sending stream is closed")
+	}
 	for iter := 1; iter <= repeat; iter++ {
 		timestarted := time.Now()
 		// this will execute the loops
-		stream, err := client.StreamedBatchGRPC(ctx)
+		stream, err := client.StreamedBatchGRPC(ctx, mode)
 		if err != nil {
 			panic(err)
 		}

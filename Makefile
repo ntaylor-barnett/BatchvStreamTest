@@ -3,12 +3,14 @@
 depend:
 	go get -u google.golang.org/grpc
 	go get -u github.com/golang/protobuf/protoc-gen-go	
+	go get -u github.com/myitcv/gobin
+	
 
 gen:
-	gobin -m -run goa.design/goa/v3/cmd/goa gen github.com/ntaylor-barnett/BatchvStreamTest/design
+	gobin -run goa.design/goa/v3/cmd/goa gen github.com/ntaylor-barnett/BatchvStreamTest/design
 
 example:
-	gobin -m -run goa.design/goa/v3/cmd/goa example github.com/ntaylor-barnett/BatchvStreamTest/design
+	gobin -run goa.design/goa/v3/cmd/goa example github.com/ntaylor-barnett/BatchvStreamTest/design
 
 build:
 	go mod vendor

@@ -65,7 +65,7 @@ func (c *Client) StreamedBatchGRPC() goa.Endpoint {
 	return func(ctx context.Context, v interface{}) (interface{}, error) {
 		inv := goagrpc.NewInvoker(
 			BuildStreamedBatchGRPCFunc(c.grpccli, c.opts...),
-			nil,
+			EncodeStreamedBatchGRPCRequest,
 			DecodeStreamedBatchGRPCResponse)
 		res, err := inv.Invoke(ctx, v)
 		if err != nil {

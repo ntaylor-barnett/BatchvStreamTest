@@ -9,6 +9,7 @@ package client
 
 import (
 	"context"
+	"fmt"
 
 	publicpb "github.com/ntaylor-barnett/BatchvStreamTest/gen/grpc/public/pb"
 	public "github.com/ntaylor-barnett/BatchvStreamTest/gen/public"
@@ -62,6 +63,19 @@ func BuildStreamedBatchGRPCFunc(grpccli publicpb.PublicClient, cliopts ...grpc.C
 		}
 		return grpccli.StreamedBatchGRPC(ctx, opts...)
 	}
+}
+
+// EncodeStreamedBatchGRPCRequest encodes requests sent to public
+// streamedBatchGRPC endpoint.
+func EncodeStreamedBatchGRPCRequest(ctx context.Context, v interface{}, md *metadata.MD) (interface{}, error) {
+	payload, ok := v.(*public.StreamMode)
+	if !ok {
+		return nil, goagrpc.ErrInvalidType("public", "streamedBatchGRPC", "*public.StreamMode", v)
+	}
+	if payload.Recieveall != nil {
+		(*md).Append("recieveall", fmt.Sprintf("%v", *payload.Recieveall))
+	}
+	return nil, nil
 }
 
 // DecodeStreamedBatchGRPCResponse decodes responses from the public

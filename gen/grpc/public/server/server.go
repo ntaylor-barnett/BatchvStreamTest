@@ -74,7 +74,7 @@ func (s *Server) BatchGRPC(ctx context.Context, message *publicpb.BatchGRPCReque
 // service "streamedBatchGRPC" endpoint.
 func NewStreamedBatchGRPCHandler(endpoint goa.Endpoint, h goagrpc.StreamHandler) goagrpc.StreamHandler {
 	if h == nil {
-		h = goagrpc.NewStreamHandler(endpoint, nil)
+		h = goagrpc.NewStreamHandler(endpoint, DecodeStreamedBatchGRPCRequest)
 	}
 	return h
 }
@@ -85,7 +85,7 @@ func (s *Server) StreamedBatchGRPC(stream publicpb.Public_StreamedBatchGRPCServe
 	ctx := stream.Context()
 	ctx = context.WithValue(ctx, goa.MethodKey, "streamedBatchGRPC")
 	ctx = context.WithValue(ctx, goa.ServiceKey, "public")
-	_, err := s.StreamedBatchGRPCH.Decode(ctx, nil)
+	p, err := s.StreamedBatchGRPCH.Decode(ctx, nil)
 	if err != nil {
 		if en, ok := err.(ErrorNamer); ok {
 			switch en.ErrorName() {
@@ -96,7 +96,8 @@ func (s *Server) StreamedBatchGRPC(stream publicpb.Public_StreamedBatchGRPCServe
 		return goagrpc.EncodeError(err)
 	}
 	ep := &public.StreamedBatchGRPCEndpointInput{
-		Stream: &StreamedBatchGRPCServerStream{stream: stream},
+		Stream:  &StreamedBatchGRPCServerStream{stream: stream},
+		Payload: p.(*public.StreamMode),
 	}
 	err = s.StreamedBatchGRPCH.Handle(ctx, ep)
 	if err != nil {

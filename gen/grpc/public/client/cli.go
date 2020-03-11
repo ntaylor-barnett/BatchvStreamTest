@@ -10,6 +10,7 @@ package client
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	publicpb "github.com/ntaylor-barnett/BatchvStreamTest/gen/grpc/public/pb"
 	public "github.com/ntaylor-barnett/BatchvStreamTest/gen/public"
@@ -24,7 +25,7 @@ func BuildBatchGRPCPayload(publicBatchGRPCMessage string) (*public.TestPayloadBa
 		if publicBatchGRPCMessage != "" {
 			err = json.Unmarshal([]byte(publicBatchGRPCMessage), &message)
 			if err != nil {
-				return nil, fmt.Errorf("invalid JSON for message, example of valid JSON:\n%s", "'{\n      \"records\": [\n         {\n            \"first_field\": \"Nisi labore praesentium.\",\n            \"organization_id\": 2448622867,\n            \"second_field\": \"Maiores natus assumenda.\",\n            \"third_field\": \"Molestias ex.\"\n         },\n         {\n            \"first_field\": \"Nisi labore praesentium.\",\n            \"organization_id\": 2448622867,\n            \"second_field\": \"Maiores natus assumenda.\",\n            \"third_field\": \"Molestias ex.\"\n         },\n         {\n            \"first_field\": \"Nisi labore praesentium.\",\n            \"organization_id\": 2448622867,\n            \"second_field\": \"Maiores natus assumenda.\",\n            \"third_field\": \"Molestias ex.\"\n         },\n         {\n            \"first_field\": \"Nisi labore praesentium.\",\n            \"organization_id\": 2448622867,\n            \"second_field\": \"Maiores natus assumenda.\",\n            \"third_field\": \"Molestias ex.\"\n         }\n      ]\n   }'")
+				return nil, fmt.Errorf("invalid JSON for message, example of valid JSON:\n%s", "'{\n      \"records\": [\n         {\n            \"first_field\": \"Nisi labore praesentium.\",\n            \"organization_id\": 2448622867,\n            \"second_field\": \"Maiores natus assumenda.\",\n            \"third_field\": \"Molestias ex.\"\n         },\n         {\n            \"first_field\": \"Nisi labore praesentium.\",\n            \"organization_id\": 2448622867,\n            \"second_field\": \"Maiores natus assumenda.\",\n            \"third_field\": \"Molestias ex.\"\n         }\n      ]\n   }'")
 			}
 		}
 	}
@@ -40,6 +41,27 @@ func BuildBatchGRPCPayload(publicBatchGRPCMessage string) (*public.TestPayloadBa
 			}
 		}
 	}
+
+	return v, nil
+}
+
+// BuildStreamedBatchGRPCPayload builds the payload for the public
+// streamedBatchGRPC endpoint from CLI flags.
+func BuildStreamedBatchGRPCPayload(publicStreamedBatchGRPCRecieveall string) (*public.StreamMode, error) {
+	var err error
+	var recieveall *bool
+	{
+		if publicStreamedBatchGRPCRecieveall != "" {
+			var val bool
+			val, err = strconv.ParseBool(publicStreamedBatchGRPCRecieveall)
+			recieveall = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for recieveall, must be BOOL")
+			}
+		}
+	}
+	v := &public.StreamMode{}
+	v.Recieveall = recieveall
 
 	return v, nil
 }

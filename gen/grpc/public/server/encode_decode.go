@@ -9,10 +9,12 @@ package server
 
 import (
 	"context"
+	"strconv"
 
 	publicpb "github.com/ntaylor-barnett/BatchvStreamTest/gen/grpc/public/pb"
 	public "github.com/ntaylor-barnett/BatchvStreamTest/gen/public"
 	goagrpc "goa.design/goa/v3/grpc"
+	goa "goa.design/goa/v3/pkg"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -55,4 +57,32 @@ func EncodeStreamedBatchGRPCResponse(ctx context.Context, v interface{}, hdr, tr
 	}
 	resp := NewStreamedBatchGRPCResponse(result)
 	return resp, nil
+}
+
+// DecodeStreamedBatchGRPCRequest decodes requests sent to "public" service
+// "streamedBatchGRPC" endpoint.
+func DecodeStreamedBatchGRPCRequest(ctx context.Context, v interface{}, md metadata.MD) (interface{}, error) {
+	var (
+		recieveall *bool
+		err        error
+	)
+	{
+		if vals := md.Get("recieveall"); len(vals) > 0 {
+			recieveallRaw := vals[0]
+
+			v, err2 := strconv.ParseBool(recieveallRaw)
+			if err2 != nil {
+				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("recieveall", recieveallRaw, "boolean"))
+			}
+			recieveall = &v
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	var payload *public.StreamMode
+	{
+		payload = NewStreamedBatchGRPCPayload(recieveall)
+	}
+	return payload, nil
 }

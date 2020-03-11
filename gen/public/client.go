@@ -39,9 +39,9 @@ func (c *Client) BatchGRPC(ctx context.Context, p *TestPayloadBatch) (res []*Res
 
 // StreamedBatchGRPC calls the "streamedBatchGRPC" endpoint of the "public"
 // service.
-func (c *Client) StreamedBatchGRPC(ctx context.Context) (res StreamedBatchGRPCClientStream, err error) {
+func (c *Client) StreamedBatchGRPC(ctx context.Context, p *StreamMode) (res StreamedBatchGRPCClientStream, err error) {
 	var ires interface{}
-	ires, err = c.StreamedBatchGRPCEndpoint(ctx, nil)
+	ires, err = c.StreamedBatchGRPCEndpoint(ctx, p)
 	if err != nil {
 		return
 	}

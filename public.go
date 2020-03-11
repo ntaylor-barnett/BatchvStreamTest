@@ -3,6 +3,7 @@ package publicapi
 import (
 	"context"
 	"log"
+	"sync"
 
 	public "github.com/ntaylor-barnett/BatchvStreamTest/gen/public"
 	"github.com/pkg/errors"
@@ -26,7 +27,7 @@ func (s *publicsrvc) BatchGRPC(ctx context.Context, p *public.TestPayloadBatch) 
 	resp := make([]*public.ResponsePayload, len(p.Records))
 	for i, v := range p.Records {
 		r := &public.ResponsePayload{
-			FirstField: v.FirstField,
+			FirstField:  v.FirstField,
 			FourthField: "yeah, no probs. All good mate",
 		}
 		resp[i] = r
@@ -35,11 +36,18 @@ func (s *publicsrvc) BatchGRPC(ctx context.Context, p *public.TestPayloadBatch) 
 }
 
 // Receives an array of payloads
-func (s *publicsrvc) StreamedBatchGRPC(ctx context.Context, stream public.StreamedBatchGRPCServerStream) (err error) {
+func (s *publicsrvc) StreamedBatchGRPC(ctx context.Context, mode *public.StreamMode, stream public.StreamedBatchGRPCServerStream) (err error) {
 	s.logger.Print("public.streamedBatchGRPC")
 	eg, egctx := errgroup.WithContext(ctx)
-	datachan := make(chan *public.TestPayload, 1000)
+	datachan := make(chan *public.TestPayload, 100000)
+	mux := &sync.Mutex{}
+
+	mux.Lock()
+	doLock := mode.Recieveall != nil && *mode.Recieveall
 	eg.Go(func() error {
+		if doLock {
+			mux.Lock()
+		}
 		// sender
 		select {
 		case <-egctx.Done():
@@ -64,6 +72,7 @@ func (s *publicsrvc) StreamedBatchGRPC(ctx context.Context, stream public.Stream
 	eg.Go(func() error {
 		//reciever
 		defer close(datachan)
+		defer mux.Unlock()
 		payload, err := stream.Recv()
 		if err != nil {
 			return err

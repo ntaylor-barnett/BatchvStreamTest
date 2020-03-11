@@ -20,12 +20,18 @@ var _ = Service("public", func() {
 	})
 	Method("streamedBatchGRPC", func() {
 		Description("Receives an array of payloads")
+		Payload(StreamMode)
 		StreamingPayload(TestPayload)
 		StreamingResult(ResponsePayload, "an example response")
 		GRPC(func() {
 			Response(CodeOK)
 		})
 	})
+})
+
+var StreamMode = Type("stream_mode", func() {
+	Description("Modifies the stream mode")
+	Field(1, "recieveall", Boolean, "if true, it will wait until all records are recieved before it processes")
 })
 
 var TestPayload = Type("test_payload", func() {

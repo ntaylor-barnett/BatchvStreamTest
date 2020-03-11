@@ -41,18 +41,6 @@ func UsageExamples() string {
             "organization_id": 2448622867,
             "second_field": "Maiores natus assumenda.",
             "third_field": "Molestias ex."
-         },
-         {
-            "first_field": "Nisi labore praesentium.",
-            "organization_id": 2448622867,
-            "second_field": "Maiores natus assumenda.",
-            "third_field": "Molestias ex."
-         },
-         {
-            "first_field": "Nisi labore praesentium.",
-            "organization_id": 2448622867,
-            "second_field": "Maiores natus assumenda.",
-            "third_field": "Molestias ex."
          }
       ]
    }'` + "\n" +
@@ -68,7 +56,8 @@ func ParseEndpoint(cc *grpc.ClientConn, opts ...grpc.CallOption) (goa.Endpoint, 
 		publicBatchGRPCFlags       = flag.NewFlagSet("batch-grpc", flag.ExitOnError)
 		publicBatchGRPCMessageFlag = publicBatchGRPCFlags.String("message", "", "")
 
-		publicStreamedBatchGRPCFlags = flag.NewFlagSet("streamed-batch-grpc", flag.ExitOnError)
+		publicStreamedBatchGRPCFlags          = flag.NewFlagSet("streamed-batch-grpc", flag.ExitOnError)
+		publicStreamedBatchGRPCRecieveallFlag = publicStreamedBatchGRPCFlags.String("recieveall", "", "")
 	)
 	publicFlags.Usage = publicUsage
 	publicBatchGRPCFlags.Usage = publicBatchGRPCUsage
@@ -144,7 +133,7 @@ func ParseEndpoint(cc *grpc.ClientConn, opts ...grpc.CallOption) (goa.Endpoint, 
 				data, err = publicc.BuildBatchGRPCPayload(*publicBatchGRPCMessageFlag)
 			case "streamed-batch-grpc":
 				endpoint = c.StreamedBatchGRPC()
-				data = nil
+				data, err = publicc.BuildStreamedBatchGRPCPayload(*publicStreamedBatchGRPCRecieveallFlag)
 			}
 		}
 	}
@@ -189,18 +178,6 @@ Example:
             "organization_id": 2448622867,
             "second_field": "Maiores natus assumenda.",
             "third_field": "Molestias ex."
-         },
-         {
-            "first_field": "Nisi labore praesentium.",
-            "organization_id": 2448622867,
-            "second_field": "Maiores natus assumenda.",
-            "third_field": "Molestias ex."
-         },
-         {
-            "first_field": "Nisi labore praesentium.",
-            "organization_id": 2448622867,
-            "second_field": "Maiores natus assumenda.",
-            "third_field": "Molestias ex."
          }
       ]
    }'
@@ -208,11 +185,12 @@ Example:
 }
 
 func publicStreamedBatchGRPCUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] public streamed-batch-grpc
+	fmt.Fprintf(os.Stderr, `%s [flags] public streamed-batch-grpc -recieveall BOOL
 
 Receives an array of payloads
+    -recieveall BOOL: 
 
 Example:
-    `+os.Args[0]+` public streamed-batch-grpc
+    `+os.Args[0]+` public streamed-batch-grpc --recieveall false
 `, os.Args[0])
 }

@@ -44,6 +44,14 @@ func NewBatchGRPCResponse(result []*public.ResponsePayload) *publicpb.BatchGRPCR
 	return message
 }
 
+// NewStreamedBatchGRPCPayload builds the payload of the "streamedBatchGRPC"
+// endpoint of the "public" service from the gRPC request type.
+func NewStreamedBatchGRPCPayload(recieveall *bool) *public.StreamMode {
+	v := &public.StreamMode{}
+	v.Recieveall = recieveall
+	return v
+}
+
 // NewStreamedBatchGRPCResponse builds the gRPC response type from the result
 // of the "streamedBatchGRPC" endpoint of the "public" service.
 func NewStreamedBatchGRPCResponse(result *public.ResponsePayload) *publicpb.StreamedBatchGRPCResponse {

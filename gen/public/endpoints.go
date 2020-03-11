@@ -22,6 +22,8 @@ type Endpoints struct {
 // StreamedBatchGRPCEndpointInput holds both the payload and the server stream
 // of the "streamedBatchGRPC" method.
 type StreamedBatchGRPCEndpointInput struct {
+	// Payload is the method payload.
+	Payload *StreamMode
 	// Stream is the server stream used by the "streamedBatchGRPC" method to send
 	// data.
 	Stream StreamedBatchGRPCServerStream
@@ -55,6 +57,6 @@ func NewBatchGRPCEndpoint(s Service) goa.Endpoint {
 func NewStreamedBatchGRPCEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
 		ep := req.(*StreamedBatchGRPCEndpointInput)
-		return nil, s.StreamedBatchGRPC(ctx, ep.Stream)
+		return nil, s.StreamedBatchGRPC(ctx, ep.Payload, ep.Stream)
 	}
 }
