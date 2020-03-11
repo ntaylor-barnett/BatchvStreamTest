@@ -23,7 +23,15 @@ func NewPublic(logger *log.Logger) public.Service {
 // Receives an array of payloads
 func (s *publicsrvc) BatchGRPC(ctx context.Context, p *public.TestPayloadBatch) (res []*public.ResponsePayload, err error) {
 	s.logger.Print("public.batchGRPC")
-	return
+	resp := make([]*public.ResponsePayload, len(p.Records))
+	for i, v := range p.Records {
+		r := &public.ResponsePayload{
+			FirstField: v.FirstField,
+			FourthField: "yeah, no probs. All good mate",
+		}
+		resp[i] = r
+	}
+	return resp, nil
 }
 
 // Receives an array of payloads
