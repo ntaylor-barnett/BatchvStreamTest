@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"sync"
+	"time"
 
 	public "github.com/ntaylor-barnett/BatchvStreamTest/gen/public"
 	"github.com/pkg/errors"
@@ -27,10 +28,7 @@ func (s *publicsrvc) BatchGRPC(ctx context.Context, p *public.TestPayloadBatch) 
 	s.logger.Print("public.batchGRPC")
 	resp := make([]*public.ResponsePayload, len(p.Records))
 	for i, v := range p.Records {
-		r := &public.ResponsePayload{
-			FirstField:  v.FirstField,
-			FourthField: "yeah, no probs. All good mate",
-		}
+		r := doWork(v)
 		resp[i] = r
 	}
 	return resp, nil
@@ -59,10 +57,7 @@ func (s *publicsrvc) StreamedBatchGRPC(ctx context.Context, mode *public.StreamM
 					return nil
 				}
 				// we will test with immediate send at the moment. This is best case scenario
-				resp := &public.ResponsePayload{
-					FirstField:  v.FirstField,
-					FourthField: "yeah, no probs. All good mate",
-				}
+				resp := doWork(v)
 				err := stream.Send(resp)
 				if err != nil {
 					return errors.Wrap(err, "error when sending reply")
@@ -96,4 +91,13 @@ func (s *publicsrvc) StreamedBatchGRPC(ctx context.Context, mode *public.StreamM
 	})
 	return eg.Wait()
 
+}
+
+func doWork(v *public.TestPayload) *public.ResponsePayload {
+	resp := &public.ResponsePayload{
+		FirstField:  v.FirstField,
+		FourthField: "yeah, no probs. All good mate",
+	}
+	time.Sleep(time.Millisecond * 10)
+	return resp
 }
